@@ -12,10 +12,12 @@ class TicketPricesManagerTest {
     private TicketPricesRepository repository = new TicketPricesRepository();
     private TicketPricesManager manager = new TicketPricesManager(repository);
     private TicketPrices first = new TicketPrices(1, 15000, "AAK", "DAB", 240);
-    private TicketPrices second = new TicketPrices(2, 20000, "AAK", "LAC", 120);
+    private TicketPrices second = new TicketPrices(2, 20000, "AAK", "DAB", 120);
     private TicketPrices third = new TicketPrices(3, 10000, "AAK", "DAB", 180);
-    private TicketPrices fourth = new TicketPrices(4, 11000, "VAR", "DAB", 400);
+    private TicketPrices fourth = new TicketPrices(4, 11000, "AAK", "DAB", 400);
     private TicketPrices fifth = new TicketPrices(5, 30000, "VAR", "LAC", 200);
+    private TicketPrices sixth = new TicketPrices(6, 15000, "AAK", "DAB", 210);
+    private TicketPrices seventh = new TicketPrices(7, 13000, "AAK", "DAB", 230);
 
     @BeforeEach
     public void setUp(){
@@ -24,12 +26,14 @@ class TicketPricesManagerTest {
         repository.save(third);
         repository.save(fourth);
         repository.save(fifth);
+        repository.save(sixth);
+        repository.save(seventh);
     }
 
     @Test
     void shouldSearchDepartureArrival(){
         TicketPrices[] actual = manager.search("AAK", "DAB");
-        TicketPrices[] expected = new TicketPrices[]{third, first};
+        TicketPrices[] expected = new TicketPrices[]{third, fourth, seventh, first, sixth, second};
         assertArrayEquals(expected, actual);
     }
 
@@ -40,4 +44,32 @@ class TicketPricesManagerTest {
         assertArrayEquals(expected, actual);
     }
 
+    @Test
+    void shouldSearchIfEmpty(){
+        repository.removeById(1);
+        repository.removeById(2);
+        repository.removeById(3);
+        repository.removeById(4);
+        repository.removeById(5);
+        repository.removeById(6);
+        repository.removeById(7);
+
+        TicketPrices[] actual = manager.search("AAK", "DAB");
+        TicketPrices[] expected = new TicketPrices[]{};
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    void shouldSearchIfOneItem(){
+        repository.removeById(1);
+        repository.removeById(2);
+        repository.removeById(3);
+        repository.removeById(4);
+        repository.removeById(5);
+        repository.removeById(7);
+
+        TicketPrices[] actual = manager.search("AAK", "DAB");
+        TicketPrices[] expected = new TicketPrices[]{sixth};
+        assertArrayEquals(expected, actual);
+    }
 }
